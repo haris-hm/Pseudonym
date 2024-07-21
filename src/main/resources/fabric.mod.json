@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "pseudonym",
+  "version": "${version}",
+  "name": "Pseudonym",
+  "description": "A server-side Minecraft mod which allows players to nickname themselves in game.",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/pseudonym/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "com.harismehuljic.pseudonym.Pseudonym"
+    ]
+  },
+  "mixins": [
+    "pseudonym.mixins.json",
+    {
+      "config": "pseudonym.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
