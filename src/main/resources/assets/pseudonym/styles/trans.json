@@ -1,0 +1,13 @@
+{
+  "prefix_bold": false,
+  "nick_bold": false,
+  "prefix_italicized": false,
+  "nick_italicized": false,
+  "gradient": [
+    "aqua",
+    "light_purple",
+    "white",
+    "light_purple",
+    "aqua"
+  ]
+}

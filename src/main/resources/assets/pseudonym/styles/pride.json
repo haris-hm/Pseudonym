@@ -1,0 +1,14 @@
+{
+  "prefix_bold": false,
+  "nick_bold": false,
+  "prefix_italicized": false,
+  "nick_italicized": false,
+  "gradient": [
+    "red",
+    "orange",
+    "yellow",
+    "green",
+    "blue",
+    "dark_purple"
+  ]
+}

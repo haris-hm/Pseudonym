@@ -1,9 +1,13 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "org.example.pseudonym.mixin",
+  "package": "com.harismehuljic.pseudonym.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
+    "AdvancementFrameMixin",
+    "PlayerEntityMixin",
+    "ServerPlayerEntityMixin",
+    "ServerPlayNetworkHandlerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
