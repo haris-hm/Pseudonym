@@ -8,6 +8,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Optional;
+
 public class Nickname {
     private final Text realName;
     private final NbtCompound nicknameData = new NbtCompound();
@@ -39,37 +41,25 @@ public class Nickname {
     }
 
     public void loadNicknameData(NbtCompound nbt, ServerPlayerEntity spe) {
-        if (nbt.contains("nickname")) {
-            this.setNickname(nbt.getString("nickname"));
-        }
+        Optional<String> nickname = nbt.getString("nickname");
+        Optional<String> nickColor = nbt.getString("nick_color");
+        Optional<Boolean> nickItalicized = nbt.getBoolean("nick_italic");
+        Optional<Boolean> nickBold = nbt.getBoolean("nick_bold");
 
-        if (nbt.contains("nick_color")) {
-            this.setNickColor(nbt.getString("nick_color"));
-        }
+        Optional<String> prefix = nbt.getString("prefix");
+        Optional<String> prefixColor = nbt.getString("prefix_color");
+        Optional<Boolean> prefixItalicized = nbt.getBoolean("prefix_italic");
+        Optional<Boolean> prefixBold = nbt.getBoolean("prefix_bold");
 
-        if (nbt.contains("nick_italic")) {
-            this.setItalicizedNick(nbt.getBoolean("nick_italic"));
-        }
+        nickname.ifPresent(this::setNickname);
+        nickColor.ifPresent(this::setNickColor);
+        nickItalicized.ifPresent(this::setItalicizedNick);
+        nickBold.ifPresent(this::setBoldNick);
 
-        if (nbt.contains("nick_bold")) {
-            this.setBoldNick(nbt.getBoolean("nick_bold"));
-        }
-
-        if (nbt.contains("prefix")) {
-            this.setPrefix(nbt.getString("prefix"));
-        }
-
-        if (nbt.contains("prefix_color")) {
-            this.setPrefixColor(nbt.getString("prefix_color"));
-        }
-
-        if (nbt.contains("prefix_italic")) {
-            this.setItalicizedPrefix(nbt.getBoolean("prefix_italic"));
-        }
-
-        if (nbt.contains("prefix_bold")) {
-            this.setBoldPrefix(nbt.getBoolean("prefix_bold"));
-        }
+        prefix.ifPresent(this::setPrefix);
+        prefixColor.ifPresent(this::setPrefixColor);
+        prefixItalicized.ifPresent(this::setItalicizedPrefix);
+        prefixBold.ifPresent(this::setBoldPrefix);
 
         this.nicknameLabel = new NicknameLabel(spe);
         this.nicknameLabel.createCustomLabel();

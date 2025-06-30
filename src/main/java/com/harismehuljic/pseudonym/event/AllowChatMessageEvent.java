@@ -29,7 +29,7 @@ public class AllowChatMessageEvent implements ServerMessageEvents.AllowChatMessa
         String messageContents = message.getSignedContent();
 
         // Send the newly formatted message to each player
-        for (ServerPlayerEntity spe : sender.server.getPlayerManager().getPlayerList()) {
+        for (ServerPlayerEntity spe : sender.getWorld().getServer().getPlayerManager().getPlayerList()) {
             assert sender.getDisplayName() != null;
 
             MutableText senderDisplayName = sender.getDisplayName().copy();
