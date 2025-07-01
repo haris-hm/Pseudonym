@@ -6,15 +6,12 @@ import com.harismehuljic.pseudonym.nicknames.impl.NickPlayer;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.c2s.common.SyncedClientOptions;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,7 +29,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ni
     @Shadow @Final
     public MinecraftServer server;
     @Unique
-    Nickname nickname;
+    private Nickname nickname;
 
     public ServerPlayerEntityMixin(ServerWorld world, GameProfile profile) {
         super(world, profile);
@@ -45,7 +42,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ni
 
     @Inject(at = @At("TAIL"), method = "tick")
     private void onTick(CallbackInfo ci) {
-        this.nickname.getNicknameLabel().hideLabel(this.isSneaking());
+        this.nickname.getNicknameLabel().tickLabel(this.isSneaking());
     }
 
     @Inject(at = @At("TAIL"), method = "getPlayerListName", cancellable = true)

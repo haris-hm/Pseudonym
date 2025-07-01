@@ -143,7 +143,7 @@ public class Nickname {
         this.nicknameData.putBoolean("nick_bold", bold);
 
         if (this.dataLoaded) {
-            nicknameLabel.updateLabel(true);
+            nicknameLabel.updateLabel();
         }
     }
 
@@ -162,7 +162,7 @@ public class Nickname {
         this.nicknameData.putBoolean("prefix_bold", boldPrefix);
 
         if (this.dataLoaded) {
-            nicknameLabel.updateLabel(true);
+            nicknameLabel.updateLabel();
         }
     }
 
