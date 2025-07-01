@@ -69,11 +69,13 @@ public class Nickname {
     public void removeNick() {
         this.nickname = null;
         this.nicknameData.remove("nickname");
+        this.nicknameLabel.updateLabel();
     }
 
     public void removePrefix() {
         this.prefix = null;
         this.nicknameData.remove("prefix");
+        this.nicknameLabel.updateLabel();
     }
 
     // Getters & Setters
@@ -154,7 +156,7 @@ public class Nickname {
         this.boldPrefix = bold;
 
         if (this.prefix != null) {
-            this.nicknameData.putString("prefix", this.nickname.getString());
+            this.nicknameData.putString("prefix", this.prefix.getString());
         }
 
         this.nicknameData.putString("prefix_color", color == null ? Formatting.WHITE.getName() : color.getName());

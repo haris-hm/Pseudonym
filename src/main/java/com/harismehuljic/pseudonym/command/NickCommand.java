@@ -51,12 +51,13 @@ public class NickCommand {
                 .executes(NickCommand::setNickname)
         ));
 
-        dispatcher.register(literal("name").redirect(nickNode));
-        dispatcher.register(literal("nickname").redirect(nickNode));
+        dispatcher.register(literal("name").redirect(nickNode).executes(NickCommand::parrotNickname));
+        dispatcher.register(literal("nickname").redirect(nickNode).executes(NickCommand::parrotNickname));
     }
 
     /**
      * Sets a players nickname based on the argument provided in the command
+     *
      * @param context The source executing the command.
      * @return Unimportant.
      */
@@ -72,9 +73,6 @@ public class NickCommand {
 
         nickPlayer.pseudonym$getNickname().setNickname(nickname);
         nickManager.pseudonym$updateDisplayName(nickPlayer);
-
-        //nickPlayer.pseudonym$getNickname().setNicknameLabel(new NicknameLabel(context.getSource().getWorld(), context.getSource().getPlayer()));
-        //nickPlayer.pseudonym$getNickname().getNicknameLabel().createCustomLabel();
 
         context.getSource().sendFeedback(() -> feedbackText("Your nickname has been changed to \"", nickname, "\"", nickPlayer.pseudonym$getNickname().getNickColor()), false);
 
@@ -141,18 +139,19 @@ public class NickCommand {
 
     /**
      * Displays a player's nickname back to them.
+     *
      * @param context The source executing the command.
      * @return Unimportant.
      */
-    private static int parrotNickname(CommandContext<ServerCommandSource> context){
+    private static int parrotNickname(CommandContext<ServerCommandSource> context) {
         final Text noNick = Text.literal("Your don't currently have a nickname set.").formatted(Formatting.AQUA);
 
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
-        String nickname = nickPlayer.pseudonym$getNickname().getNickname().toString();
+        Text nickname = nickPlayer.pseudonym$getNickname().getNickname();
 
-        Text nickText = nickname == null ? noNick : feedbackText("Your current nickname is \"", nickname, "\"", nickPlayer.pseudonym$getNickname().getNickColor());
+        Text nickText = nickname == null ? noNick : feedbackText("Your current nickname is \"", nickname.getString(), "\"", nickPlayer.pseudonym$getNickname().getNickColor());
 
-        context.getSource().sendFeedback(() -> nickText,false);
+        context.getSource().sendFeedback(() -> nickText, false);
 
         return 0;
     }

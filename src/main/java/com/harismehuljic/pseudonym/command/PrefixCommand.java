@@ -53,6 +53,7 @@ public class PrefixCommand {
 
     /**
      * Sets a players prefix based on the argument provided in the command
+     *
      * @param context The source executing the command.
      * @return Unimportant.
      */
@@ -132,15 +133,15 @@ public class PrefixCommand {
         return 0;
     }
 
-    private static int parrotPrefix(CommandContext<ServerCommandSource> context){
+    private static int parrotPrefix(CommandContext<ServerCommandSource> context) {
         final Text noPrefix = Text.literal("Your don't currently have a prefix set.").formatted(Formatting.AQUA);
 
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
-        String prefix = nickPlayer.pseudonym$getNickname().getPrefix().toString();
+        Text prefix = nickPlayer.pseudonym$getNickname().getPrefix();
 
-        Text prefixText = prefix == null ? noPrefix : feedbackText("Your current prefix is \"", prefix, "\"", nickPlayer.pseudonym$getNickname().getPrefixColor());
+        Text prefixText = prefix == null ? noPrefix : feedbackText("Your current prefix is \"", prefix.getString(), "\"", nickPlayer.pseudonym$getNickname().getPrefixColor());
 
-        context.getSource().sendFeedback(() -> prefixText,false);
+        context.getSource().sendFeedback(() -> prefixText, false);
 
         return 0;
     }

@@ -14,7 +14,8 @@ public class NicknameLabel {
     private final ServerPlayerEntity spe;
     private final NickPlayer nickPlayer;
     private DisplayEntity.TextDisplayEntity label;
-    private boolean sneakChecked = false;
+    private boolean playerSneaking = false;
+    private boolean recreateLabel = true;
 
     public NicknameLabel(ServerPlayerEntity spe) {
         this.spe = spe;
@@ -36,7 +37,7 @@ public class NicknameLabel {
         this.label.setText(formattedName);
         this.label.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
 
-        if (this.sneakChecked) {
+        if (this.playerSneaking) {
             this.label.setDisplayFlags((byte) 4);
             this.label.setTextOpacity((byte) 180);
             this.label.setTransformation(new AffineTransformation(new Vector3f(0.0f, 0.1f, 0.0f), null, null, null));
@@ -48,12 +49,16 @@ public class NicknameLabel {
     }
 
     public void tickLabel(boolean sneaking) {
-        if (this.label == null || this.label.isRemoved()) {
+        if ((this.label == null || this.label.isRemoved()) && this.recreateLabel && !this.spe.isSpectator()) {
             this.createCustomLabel();
         }
 
-        if (sneaking == !this.sneakChecked) {
-            this.sneakChecked = sneaking;
+        if (this.spe.isSpectator()) {
+            this.destroyLabel();
+        }
+
+        if (sneaking == !this.playerSneaking) {
+            this.playerSneaking = sneaking;
             this.updateLabel();
         }
 
@@ -68,5 +73,10 @@ public class NicknameLabel {
 
     public void destroyLabel() {
         this.label.remove(Entity.RemovalReason.DISCARDED);
+    }
+
+    public void destroyLabel(boolean persistent) {
+        this.label.remove(Entity.RemovalReason.DISCARDED);
+        this.recreateLabel = false;
     }
 }

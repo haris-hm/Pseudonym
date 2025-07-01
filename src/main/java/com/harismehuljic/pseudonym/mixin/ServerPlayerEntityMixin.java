@@ -26,7 +26,8 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ni
     @Shadow
     public ServerPlayNetworkHandler networkHandler;
 
-    @Shadow @Final
+    @Shadow
+    @Final
     public MinecraftServer server;
     @Unique
     private Nickname nickname;
@@ -57,7 +58,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ni
     }
 
     public void pseudonym$writeCustomData() {
-        this.nickname.getNicknameLabel().destroyLabel();
+        this.nickname.getNicknameLabel().destroyLabel(true);
         PlayerData.savePlayerData(this.getServer(), this.networkHandler.getPlayer(), this.nickname.getNicknameData());
     }
 
