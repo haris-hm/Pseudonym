@@ -23,28 +23,35 @@ public class NicknameLabel {
 
     public void createCustomLabel() {
         ServerWorld world = this.spe.getWorld();
+
         this.label = new DisplayEntity.TextDisplayEntity(EntityType.TEXT_DISPLAY, world);
+        this.label.setPosition(this.spe.getPos());
+        this.tickLabel(true);
+
         world.spawnEntity(this.label);
     }
 
     public void updateLabel() {
         Text formattedName = this.nickPlayer.pseudonym$getNickname().getFinalStylizedName();
         this.label.setText(formattedName);
-        this.label.setDisplayWidth(1.0F);
-        this.label.setDisplayHeight(1.25F);
-        this.label.setTransformation(new AffineTransformation(new Vector3f(0.0f, 0.3f, 0.0f), null, null, null));
         this.label.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
 
         if (this.sneakChecked) {
-            this.label.setDisplayFlags((byte) 0);
+            this.label.setDisplayFlags((byte) 4);
             this.label.setTextOpacity((byte) 180);
+            this.label.setTransformation(new AffineTransformation(new Vector3f(0.0f, 0.1f, 0.0f), null, null, null));
         } else {
             this.label.setDisplayFlags((byte) 2);
-            this.label.setTextOpacity((byte) 255);
+            this.label.setTextOpacity((byte) 225);
+            this.label.setTransformation(new AffineTransformation(new Vector3f(0.0f, 0.25f, 0.0f), null, null, null));
         }
     }
 
     public void tickLabel(boolean sneaking) {
+        if (this.label == null || this.label.isRemoved()) {
+            this.createCustomLabel();
+        }
+
         if (sneaking == !this.sneakChecked) {
             this.sneakChecked = sneaking;
             this.updateLabel();
@@ -54,6 +61,9 @@ public class NicknameLabel {
             this.label.startRiding(this.spe, true);
         }
 
+        if (!this.spe.isAlive()) {
+            this.destroyLabel();
+        }
     }
 
     public void destroyLabel() {
