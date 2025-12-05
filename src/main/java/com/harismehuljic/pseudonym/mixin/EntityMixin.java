@@ -13,9 +13,9 @@ public abstract class EntityMixin {
      * Entity#startRiding(Entity, boolean).
      */
     @Redirect(
-            method = "startRiding(Lnet/minecraft/entity/Entity;Z)Z",
-            at     = @At(
-                    value  = "INVOKE",
+            method = "startRiding(Lnet/minecraft/entity/Entity;ZZ)Z",
+            at = @At(
+                    value = "INVOKE",
                     target = "Lnet/minecraft/entity/EntityType;isSaveable()Z"
             )
     )

@@ -23,10 +23,10 @@ public class NicknameLabel {
     }
 
     public void createCustomLabel() {
-        ServerWorld world = this.spe.getWorld();
+        ServerWorld world = this.spe.getEntityWorld();
 
         this.label = new DisplayEntity.TextDisplayEntity(EntityType.TEXT_DISPLAY, world);
-        this.label.setPosition(this.spe.getPos());
+        this.label.setPosition(this.spe.getEntityPos());
         this.tickLabel(true);
 
         world.spawnEntity(this.label);
@@ -63,7 +63,7 @@ public class NicknameLabel {
         }
 
         if (!this.spe.hasPassengers()) {
-            this.label.startRiding(this.spe, true);
+            this.label.startRiding(this.spe, true, false);
         }
 
         if (!this.spe.isAlive()) {

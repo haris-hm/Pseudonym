@@ -29,7 +29,7 @@ public class Nickname {
     private NicknameLabel nicknameLabel;
 
     public Nickname(GameProfile profile) {
-        this.realName = Text.literal(profile.getName());
+        this.realName = Text.literal(profile.name());
 
         this.setNickColor(Formatting.WHITE);
         this.setPrefixColor(Formatting.WHITE);

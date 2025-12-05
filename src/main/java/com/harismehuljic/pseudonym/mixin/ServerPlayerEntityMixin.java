@@ -52,14 +52,14 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements Ni
     }
 
     public void pseudonym$readCustomData(ServerPlayerEntity spe) {
-        NbtCompound nbt = PlayerData.readPlayerData(this.getServer(), this.networkHandler.getPlayer());
+        NbtCompound nbt = PlayerData.readPlayerData(this.server, this.networkHandler.getPlayer());
 
         this.nickname.loadNicknameData(nbt == null ? new NbtCompound() : nbt, spe);
     }
 
     public void pseudonym$writeCustomData() {
         this.nickname.getNicknameLabel().destroyLabel(true);
-        PlayerData.savePlayerData(this.getServer(), this.networkHandler.getPlayer(), this.nickname.getNicknameData());
+        PlayerData.savePlayerData(this.server, this.networkHandler.getPlayer(), this.nickname.getNicknameData());
     }
 
     public Nickname pseudonym$getNickname() {

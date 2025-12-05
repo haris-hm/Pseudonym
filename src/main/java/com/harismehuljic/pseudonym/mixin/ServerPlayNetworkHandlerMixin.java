@@ -21,7 +21,7 @@ public abstract class ServerPlayNetworkHandlerMixin implements NickManager {
      */
     @Override
     public void pseudonym$updateDisplayName(NickPlayer nickPlayer) {
-        Objects.requireNonNull(this.player.getServer())
+        Objects.requireNonNull(this.player.getEntityWorld().getServer())
                 .getPlayerManager()
                 .sendToAll(new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME, this.player));
     }

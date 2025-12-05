@@ -29,6 +29,5 @@ public class Registries {
         ServerPlayConnectionEvents.JOIN.register(new PlayerConnectionEvents.PlayerJoinEvent());
         ServerPlayConnectionEvents.DISCONNECT.register(new PlayerConnectionEvents.PlayerLeaveEvent());
         ServerEntityWorldChangeEvents.AFTER_PLAYER_CHANGE_WORLD.register(new WorldChangeEvent());
-
     }
 }

@@ -21,12 +21,12 @@ public class PlayerData {
         Path playerDataPath = getPlayerDataPath(server, spe);
 
         try {
-            if(!nbt.isEmpty()) {
+            if (!nbt.isEmpty()) {
                 Files.createDirectories(playerDataPath.getParent());
                 NbtIo.writeCompressed(nbt, playerDataPath);
             }
         } catch (IOException e) {
-            playerDataLogger.error(String.format("Couldn't save player data for %s.\n%s", spe.getGameProfile().getName(), e.getMessage()));
+            playerDataLogger.error(String.format("Couldn't save player data for %s.\n%s", spe.getGameProfile().name(), e.getMessage()));
         }
     }
 
@@ -35,14 +35,13 @@ public class PlayerData {
 
         try {
             if (!Files.exists(playerDataPath)) {
-                playerDataLogger.info(String.format("Player data does not yet exist for %s.", spe.getGameProfile().getName()));
+                playerDataLogger.info(String.format("Player data does not yet exist for %s.", spe.getGameProfile().name()));
                 return null;
             }
 
             return NbtIo.readCompressed(playerDataPath, NbtSizeTracker.ofUnlimitedBytes());
-        }
-        catch (IOException e) {
-            playerDataLogger.error(String.format("Couldn't load player data for %s.\n%s", spe.getGameProfile().getName(), e.getMessage()));
+        } catch (IOException e) {
+            playerDataLogger.error(String.format("Couldn't load player data for %s.\n%s", spe.getGameProfile().name(), e.getMessage()));
             return null;
         }
     }
