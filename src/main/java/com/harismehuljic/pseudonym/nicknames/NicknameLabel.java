@@ -4,6 +4,7 @@ import com.harismehuljic.pseudonym.nicknames.impl.NickPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.decoration.DisplayEntity;
+import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
@@ -40,7 +41,10 @@ public class NicknameLabel {
         if (this.playerSneaking) {
             this.label.setDisplayFlags((byte) 4);
             this.label.setTextOpacity((byte) 180);
-            this.label.setTransformation(new AffineTransformation(new Vector3f(0.0f, 0.1f, 0.0f), null, null, null));
+
+            if (!this.spe.isInSwimmingPose()) {
+                this.label.setTransformation(new AffineTransformation(new Vector3f(0.0f, 0.1f, 0.0f), null, null, null));
+            }
         } else {
             this.label.setDisplayFlags((byte) 2);
             this.label.setTextOpacity((byte) 225);
@@ -49,11 +53,16 @@ public class NicknameLabel {
     }
 
     public void tickLabel(boolean sneaking) {
-        if ((this.label == null || this.label.isRemoved()) && this.recreateLabel && !this.spe.isSpectator()) {
-            this.createCustomLabel();
-        }
+        boolean isPlayerInvisible = this.spe.isSpectator() || this.spe.isInvisible();
 
-        if (this.spe.isSpectator()) {
+        // Make the label invisible to the label's player
+        this.spe.networkHandler.sendPacket(
+                new EntitiesDestroyS2CPacket(this.label.getId())
+        );
+
+        if ((this.label == null || this.label.isRemoved()) && this.recreateLabel && !isPlayerInvisible) {
+            this.createCustomLabel();
+        } else if (isPlayerInvisible) {
             this.destroyLabel();
         }
 
@@ -77,6 +86,6 @@ public class NicknameLabel {
 
     public void destroyLabel(boolean persistent) {
         this.label.remove(Entity.RemovalReason.DISCARDED);
-        this.recreateLabel = false;
+        if (persistent) this.recreateLabel = false;
     }
 }
