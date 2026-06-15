@@ -4,11 +4,11 @@
   "package": "com.harismehuljic.pseudonym.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "AdvancementFrameMixin",
+    "AdvancementTypeMixin",
     "EntityMixin",
-    "PlayerEntityMixin",
-    "ServerPlayerEntityMixin",
-    "ServerPlayNetworkHandlerMixin"
+    "PlayerMixin",
+    "ServerGamePacketListenerImplMixin",
+    "ServerPlayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1

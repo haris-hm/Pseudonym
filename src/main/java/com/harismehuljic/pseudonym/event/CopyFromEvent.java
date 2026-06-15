@@ -3,7 +3,7 @@ package com.harismehuljic.pseudonym.event;
 import com.harismehuljic.pseudonym.nicknames.impl.NickManager;
 import com.harismehuljic.pseudonym.nicknames.impl.NickPlayer;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
-import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.server.level.ServerPlayer;
 
 public class CopyFromEvent implements ServerPlayerEvents.CopyFrom {
     /**
@@ -14,8 +14,8 @@ public class CopyFromEvent implements ServerPlayerEvents.CopyFrom {
      * @param alive     whether the old player is still alive
      */
     @Override
-    public void copyFromPlayer(ServerPlayerEntity oldPlayer, ServerPlayerEntity newPlayer, boolean alive) {
-        NickManager newPlayerManager = (NickManager) newPlayer.networkHandler;
+    public void copyFromPlayer(ServerPlayer oldPlayer, ServerPlayer newPlayer, boolean alive) {
+        NickManager newPlayerManager = (NickManager) newPlayer.connection;
 
         NickPlayer oldNickPlayer = (NickPlayer) oldPlayer;
         NickPlayer newNickPlayer = (NickPlayer) newPlayer;

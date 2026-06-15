@@ -1,12 +1,12 @@
 package com.harismehuljic.pseudonym.event;
 
 import net.fabricmc.fabric.api.message.v1.ServerMessageEvents;
-import net.minecraft.network.message.MessageType;
-import net.minecraft.network.message.SignedMessage;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ChatType;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.PlayerChatMessage;
+import net.minecraft.server.level.ServerPlayer;
 
 public class AllowChatMessageEvent implements ServerMessageEvents.AllowChatMessage {
     /**
@@ -21,25 +21,25 @@ public class AllowChatMessageEvent implements ServerMessageEvents.AllowChatMessa
      *
      * @param message the broadcast message with message decorators applied; use {@code message.getContent()} to get the text
      * @param sender  the player that sent the message
-     * @param params  the {@link MessageType.Parameters}
+     * @param params  the {@link ChatType.Bound}
      * @return {@code true} if the message should be broadcast, otherwise {@code false}
      */
     @Override
-    public boolean allowChatMessage(SignedMessage message, ServerPlayerEntity sender, MessageType.Parameters params) {
-        String messageContents = message.getSignedContent();
+    public boolean allowChatMessage(PlayerChatMessage message, ServerPlayer sender, ChatType.Bound params) {
+        String messageContents = message.signedContent();
 
         // Send the newly formatted message to each player
-        for (ServerPlayerEntity spe : sender.getEntityWorld().getServer().getPlayerManager().getPlayerList()) {
+        for (ServerPlayer spe : sender.level().getServer().getPlayerList().getPlayers()) {
             assert sender.getDisplayName() != null;
 
-            MutableText senderDisplayName = sender.getDisplayName().copy();
-            MutableText separator = Text.literal(" 》 ").formatted(Formatting.WHITE);
-            MutableText msg = Text.literal(messageContents).formatted(Formatting.WHITE);
+            MutableComponent senderDisplayName = sender.getDisplayName().copy();
+            MutableComponent separator = Component.literal(" 》 ").withStyle(ChatFormatting.WHITE);
+            MutableComponent msg = Component.literal(messageContents).withStyle(ChatFormatting.WHITE);
 
             separator.setStyle(separator.getStyle().withBold(false).withItalic(false));
             msg.setStyle(separator.getStyle().withBold(false).withItalic(false));
 
-            spe.sendMessage(senderDisplayName.append(separator).append(msg));
+            spe.sendSystemMessage(senderDisplayName.append(separator).append(msg));
         }
 
         // Block the sending of the original Minecraft formatted message

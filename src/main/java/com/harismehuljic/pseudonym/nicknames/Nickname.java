@@ -1,25 +1,25 @@
 package com.harismehuljic.pseudonym.nicknames;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.level.ServerPlayer;
 
 public class Nickname {
-    private final Text realName;
-    private final NbtCompound nicknameData = new NbtCompound();
+    private final Component realName;
+    private final CompoundTag nicknameData = new CompoundTag();
 
     private boolean dataLoaded = false;
 
-    private Text nickname;
-    private Text prefix;
-    private Formatting nickColor;
-    private Formatting prefixColor;
+    private Component nickname;
+    private Component prefix;
+    private ChatFormatting nickColor;
+    private ChatFormatting prefixColor;
 
     private boolean italicizedNick;
     private boolean italicizedPrefix;
@@ -29,10 +29,10 @@ public class Nickname {
     private NicknameLabel nicknameLabel;
 
     public Nickname(GameProfile profile) {
-        this.realName = Text.literal(profile.name());
+        this.realName = Component.literal(profile.name());
 
-        this.setNickColor(Formatting.WHITE);
-        this.setPrefixColor(Formatting.WHITE);
+        this.setNickColor(ChatFormatting.WHITE);
+        this.setPrefixColor(ChatFormatting.WHITE);
 
         this.setItalicizedNick(false);
         this.setItalicizedPrefix(false);
@@ -40,7 +40,7 @@ public class Nickname {
         this.setBoldPrefix(false);
     }
 
-    public void loadNicknameData(NbtCompound nbt, ServerPlayerEntity spe) {
+    public void loadNicknameData(CompoundTag nbt, ServerPlayer spe) {
         Optional<String> nickname = nbt.getString("nickname");
         Optional<String> nickColor = nbt.getString("nick_color");
         Optional<Boolean> nickItalicized = nbt.getBoolean("nick_italic");
@@ -80,22 +80,22 @@ public class Nickname {
 
     // Getters & Setters
 
-    public Text getFinalStylizedName() {
-        MutableText formattedName = this.formatName();
-        MutableText formattedPrefix = this.formatPrefix();
+    public Component getFinalStylizedName() {
+        MutableComponent formattedName = this.formatName();
+        MutableComponent formattedPrefix = this.formatPrefix();
 
         return formattedPrefix == null ? formattedName : formattedPrefix.append(formattedName);
     }
 
-    private MutableText formatName() {
-        MutableText formattedName = this.nickname != null ? this.nickname.copy().formatted(this.nickColor) : this.realName.copy().formatted(this.nickColor);
+    private MutableComponent formatName() {
+        MutableComponent formattedName = this.nickname != null ? this.nickname.copy().withStyle(this.nickColor) : this.realName.copy().withStyle(this.nickColor);
 
         if (this.italicizedNick) {
-            formattedName.formatted(Formatting.ITALIC);
+            formattedName.withStyle(ChatFormatting.ITALIC);
         }
 
         if (this.boldNick) {
-            formattedName.formatted(Formatting.BOLD);
+            formattedName.withStyle(ChatFormatting.BOLD);
         }
 
         if (this.italicizedPrefix && !this.italicizedNick) {
@@ -109,30 +109,30 @@ public class Nickname {
         return formattedName;
     }
 
-    private MutableText formatPrefix() {
+    private MutableComponent formatPrefix() {
         if (this.prefix == null) {
             return null;
         }
 
-        MutableText formattedPrefix = Text.literal("[")
+        MutableComponent formattedPrefix = Component.literal("[")
                 .append(this.prefix)
-                .append(Text.literal("] "))
-                .formatted(this.prefixColor);
+                .append(Component.literal("] "))
+                .withStyle(this.prefixColor);
 
         if (this.italicizedPrefix) {
-            formattedPrefix.formatted(Formatting.ITALIC);
+            formattedPrefix.withStyle(ChatFormatting.ITALIC);
         }
 
         if (this.boldPrefix) {
-            formattedPrefix.formatted(Formatting.BOLD);
+            formattedPrefix.withStyle(ChatFormatting.BOLD);
         }
 
         return formattedPrefix;
     }
 
-    private void setNickname(Text nickname, @Nullable Formatting color, boolean italicized, boolean bold) {
+    private void setNickname(Component nickname, @Nullable ChatFormatting color, boolean italicized, boolean bold) {
         this.nickname = nickname;
-        this.nickColor = color == null ? Formatting.WHITE : color;
+        this.nickColor = color == null ? ChatFormatting.WHITE : color;
         this.italicizedNick = italicized;
         this.boldNick = bold;
 
@@ -140,7 +140,7 @@ public class Nickname {
             this.nicknameData.putString("nickname", nickname.getString());
         }
 
-        this.nicknameData.putString("nick_color", color == null ? Formatting.WHITE.getName() : color.getName());
+        this.nicknameData.putString("nick_color", color == null ? ChatFormatting.WHITE.getName() : color.getName());
         this.nicknameData.putBoolean("nick_italic", italicized);
         this.nicknameData.putBoolean("nick_bold", bold);
 
@@ -149,9 +149,9 @@ public class Nickname {
         }
     }
 
-    private void setPrefix(Text prefix, @Nullable Formatting color, boolean italicized, boolean bold) {
+    private void setPrefix(Component prefix, @Nullable ChatFormatting color, boolean italicized, boolean bold) {
         this.prefix = prefix;
-        this.prefixColor = color == null ? Formatting.WHITE : color;
+        this.prefixColor = color == null ? ChatFormatting.WHITE : color;
         this.italicizedPrefix = italicized;
         this.boldPrefix = bold;
 
@@ -159,7 +159,7 @@ public class Nickname {
             this.nicknameData.putString("prefix", this.prefix.getString());
         }
 
-        this.nicknameData.putString("prefix_color", color == null ? Formatting.WHITE.getName() : color.getName());
+        this.nicknameData.putString("prefix_color", color == null ? ChatFormatting.WHITE.getName() : color.getName());
         this.nicknameData.putBoolean("prefix_italic", italicizedPrefix);
         this.nicknameData.putBoolean("prefix_bold", boldPrefix);
 
@@ -169,18 +169,18 @@ public class Nickname {
     }
 
     public void setNickname(String nickname) {
-        this.setNickname(Text.literal(nickname), this.nickColor, this.italicizedNick, this.boldNick);
+        this.setNickname(Component.literal(nickname), this.nickColor, this.italicizedNick, this.boldNick);
     }
 
     public void setNickColor(String color) {
-        this.setNickname(this.nickname, Formatting.byName(color), this.italicizedNick, this.boldNick);
+        this.setNickname(this.nickname, ChatFormatting.getByName(color), this.italicizedNick, this.boldNick);
     }
 
-    public void setNickname(Text nickname) {
+    public void setNickname(Component nickname) {
         this.setNickname(nickname, this.nickColor, this.italicizedNick, this.boldNick);
     }
 
-    public void setNickColor(Formatting color) {
+    public void setNickColor(ChatFormatting color) {
         this.setNickname(this.nickname, color, this.italicizedNick, this.boldNick);
     }
 
@@ -193,18 +193,18 @@ public class Nickname {
     }
 
     public void setPrefix(String prefix) {
-        this.setPrefix(Text.literal(prefix), this.prefixColor, this.italicizedPrefix, this.boldPrefix);
+        this.setPrefix(Component.literal(prefix), this.prefixColor, this.italicizedPrefix, this.boldPrefix);
     }
 
     public void setPrefixColor(String color) {
-        this.setPrefix(this.prefix, Formatting.byName(color), this.italicizedPrefix, this.boldPrefix);
+        this.setPrefix(this.prefix, ChatFormatting.getByName(color), this.italicizedPrefix, this.boldPrefix);
     }
 
-    public void setPrefix(Text prefix) {
+    public void setPrefix(Component prefix) {
         this.setPrefix(prefix, this.prefixColor, this.italicizedPrefix, this.boldPrefix);
     }
 
-    public void setPrefixColor(Formatting color) {
+    public void setPrefixColor(ChatFormatting color) {
         this.setPrefix(this.prefix, color, this.italicizedPrefix, this.boldPrefix);
     }
 
@@ -220,23 +220,23 @@ public class Nickname {
         this.nicknameLabel = nicknameLabel;
     }
 
-    public Text getRealName() {
+    public Component getRealName() {
         return realName;
     }
 
-    public Text getNickname() {
+    public Component getNickname() {
         return nickname;
     }
 
-    public Text getPrefix() {
+    public Component getPrefix() {
         return prefix;
     }
 
-    public Formatting getNickColor() {
+    public ChatFormatting getNickColor() {
         return nickColor;
     }
 
-    public Formatting getPrefixColor() {
+    public ChatFormatting getPrefixColor() {
         return prefixColor;
     }
 
@@ -260,7 +260,7 @@ public class Nickname {
         return nicknameLabel;
     }
 
-    public NbtCompound getNicknameData() {
+    public CompoundTag getNicknameData() {
         return nicknameData;
     }
 }

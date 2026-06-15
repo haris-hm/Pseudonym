@@ -1,7 +1,7 @@
 package com.harismehuljic.pseudonym.mixin;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -13,10 +13,10 @@ public abstract class EntityMixin {
      * Entity#startRiding(Entity, boolean).
      */
     @Redirect(
-            method = "startRiding(Lnet/minecraft/entity/Entity;ZZ)Z",
+            method = "startRiding(Lnet/minecraft/world/entity/Entity;ZZ)Z",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/EntityType;isSaveable()Z"
+                    target = "Lnet/minecraft/world/entity/EntityType;canSerialize()Z"
             )
     )
     private boolean pseudonym$allowPlayerVehicles(EntityType instance) {
@@ -25,6 +25,6 @@ public abstract class EntityMixin {
             return true;
         }
         // All other entity types keep their normal behaviour
-        return instance.isSaveable();
+        return instance.canSerialize();
     }
 }

@@ -1,54 +1,54 @@
 package com.harismehuljic.pseudonym.nicknames;
 
 import com.harismehuljic.pseudonym.nicknames.impl.NickPlayer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.DisplayEntity;
-import net.minecraft.network.packet.s2c.play.EntitiesDestroyS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.AffineTransformation;
+import com.mojang.math.Transformation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Display;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import org.joml.Vector3f;
 
 public class NicknameLabel {
-    private final ServerPlayerEntity spe;
+    private final ServerPlayer spe;
     private final NickPlayer nickPlayer;
-    private DisplayEntity.TextDisplayEntity label;
+    private Display.TextDisplay label;
     private boolean playerSneaking = false;
     private boolean recreateLabel = true;
 
-    public NicknameLabel(ServerPlayerEntity spe) {
+    public NicknameLabel(ServerPlayer spe) {
         this.spe = spe;
         this.nickPlayer = (NickPlayer) spe;
     }
 
     public void createCustomLabel() {
-        ServerWorld world = this.spe.getEntityWorld();
+        ServerLevel world = this.spe.level();
 
-        this.label = new DisplayEntity.TextDisplayEntity(EntityType.TEXT_DISPLAY, world);
-        this.label.setPosition(this.spe.getEntityPos());
+        this.label = new Display.TextDisplay(EntityType.TEXT_DISPLAY, world);
+        this.label.setPos(this.spe.position());
         this.tickLabel(true);
 
-        world.spawnEntity(this.label);
+        world.addFreshEntity(this.label);
     }
 
     public void updateLabel() {
-        Text formattedName = this.nickPlayer.pseudonym$getNickname().getFinalStylizedName();
+        Component formattedName = this.nickPlayer.pseudonym$getNickname().getFinalStylizedName();
         this.label.setText(formattedName);
-        this.label.setBillboardMode(DisplayEntity.BillboardMode.CENTER);
+        this.label.setBillboardConstraints(Display.BillboardConstraints.CENTER);
 
         if (this.playerSneaking) {
-            this.label.setDisplayFlags((byte) 4);
+            this.label.setFlags((byte) 4);
             this.label.setTextOpacity((byte) 180);
 
-            if (!this.spe.isInSwimmingPose()) {
-                this.label.setTransformation(new AffineTransformation(new Vector3f(0.0f, 0.1f, 0.0f), null, null, null));
+            if (!this.spe.isVisuallySwimming()) {
+                this.label.setTransformation(new Transformation(new Vector3f(0.0f, 0.1f, 0.0f), null, null, null));
             }
         } else {
-            this.label.setDisplayFlags((byte) 2);
+            this.label.setFlags((byte) 2);
             this.label.setTextOpacity((byte) 225);
-            this.label.setTransformation(new AffineTransformation(new Vector3f(0.0f, 0.25f, 0.0f), null, null, null));
+            this.label.setTransformation(new Transformation(new Vector3f(0.0f, 0.25f, 0.0f), null, null, null));
         }
     }
 
@@ -56,8 +56,8 @@ public class NicknameLabel {
         boolean isPlayerInvisible = this.spe.isSpectator() || this.spe.isInvisible();
 
         // Make the label invisible to the label's player
-        this.spe.networkHandler.sendPacket(
-                new EntitiesDestroyS2CPacket(this.label.getId())
+        this.spe.connection.send(
+                new ClientboundRemoveEntitiesPacket(this.label.getId())
         );
 
         if ((this.label == null || this.label.isRemoved()) && this.recreateLabel && !isPlayerInvisible) {
@@ -71,7 +71,7 @@ public class NicknameLabel {
             this.updateLabel();
         }
 
-        if (!this.spe.hasPassengers()) {
+        if (!this.spe.isVehicle()) {
             this.label.startRiding(this.spe, true, false);
         }
 

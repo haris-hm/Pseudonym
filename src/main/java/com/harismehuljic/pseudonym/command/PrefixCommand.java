@@ -8,28 +8,27 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import net.minecraft.command.CommandRegistryAccess;
-import net.minecraft.command.CommandSource;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
 import java.util.Objects;
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.network.chat.Component;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
 
 public class PrefixCommand {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher, CommandRegistryAccess registryAccess,
-                                CommandManager.RegistrationEnvironment environment) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext registryAccess,
+                                Commands.CommandSelection environment) {
         dispatcher.register(literal("prefix")
                 .then(literal("set")
-                        .then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("prefix", StringArgumentType.greedyString())
+                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("prefix", StringArgumentType.greedyString())
                                 .executes(PrefixCommand::setPrefix)
                         )
                 )
                 .then(literal("color")
-                        .then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("color", StringArgumentType.greedyString())
+                        .then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("color", StringArgumentType.greedyString())
                                 .suggests(COLOR_PROVIDER)
                                 .executes(PrefixCommand::setPrefixColor)
                         )
@@ -46,7 +45,7 @@ public class PrefixCommand {
                 .executes(PrefixCommand::parrotPrefix)
         );
 
-        dispatcher.register(literal("p").then(RequiredArgumentBuilder.<ServerCommandSource, String>argument("prefix", StringArgumentType.greedyString())
+        dispatcher.register(literal("p").then(RequiredArgumentBuilder.<CommandSourceStack, String>argument("prefix", StringArgumentType.greedyString())
                 .executes(PrefixCommand::setPrefix)
         ));
     }
@@ -57,103 +56,103 @@ public class PrefixCommand {
      * @param context The source executing the command.
      * @return Unimportant.
      */
-    private static int setPrefix(CommandContext<ServerCommandSource> context) {
-        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).networkHandler;
+    private static int setPrefix(CommandContext<CommandSourceStack> context) {
+        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).connection;
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
         final String prefix = StringArgumentType.getString(context, "prefix");
 
         if (!NickManager.validateNickname(prefix) && Pseudonym.CONFIG_DATA.enforceValidNicknameCharacters()) {
-            context.getSource().sendFeedback(() -> feedbackText("Sorry, but \"", prefix, "\" isn't a valid prefix.", Formatting.LIGHT_PURPLE), false);
+            context.getSource().sendSuccess(() -> feedbackText("Sorry, but \"", prefix, "\" isn't a valid prefix.", ChatFormatting.LIGHT_PURPLE), false);
             return 1;
         }
 
         nickPlayer.pseudonym$getNickname().setPrefix(prefix);
         nickManager.pseudonym$updateDisplayName(nickPlayer);
 
-        context.getSource().sendFeedback(() -> feedbackText("Your prefix has been changed to \"", prefix, "\"", nickPlayer.pseudonym$getNickname().getPrefixColor()), false);
+        context.getSource().sendSuccess(() -> feedbackText("Your prefix has been changed to \"", prefix, "\"", nickPlayer.pseudonym$getNickname().getPrefixColor()), false);
 
         return 0;
     }
 
-    private static int setPrefixColor(CommandContext<ServerCommandSource> context) {
-        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).networkHandler;
+    private static int setPrefixColor(CommandContext<CommandSourceStack> context) {
+        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).connection;
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
         final String color = StringArgumentType.getString(context, "color");
 
-        if (!Formatting.getNames(true, false).contains(color)) {
-            context.getSource().sendFeedback(() -> feedbackText("Sorry, but \"", color, "\" isn't a valid color.", Formatting.LIGHT_PURPLE), false);
+        if (!ChatFormatting.getNames(true, false).contains(color)) {
+            context.getSource().sendSuccess(() -> feedbackText("Sorry, but \"", color, "\" isn't a valid color.", ChatFormatting.LIGHT_PURPLE), false);
             return 1;
         }
 
         nickPlayer.pseudonym$getNickname().setPrefixColor(color);
         nickManager.pseudonym$updateDisplayName(nickPlayer);
 
-        context.getSource().sendFeedback(() -> feedbackText("Your prefix color has been changed to \"", color, "\"", Formatting.byName(color)), false);
+        context.getSource().sendSuccess(() -> feedbackText("Your prefix color has been changed to \"", color, "\"", ChatFormatting.getByName(color)), false);
         return 0;
     }
 
-    private static int removePrefix(CommandContext<ServerCommandSource> context) {
-        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).networkHandler;
+    private static int removePrefix(CommandContext<CommandSourceStack> context) {
+        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).connection;
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
 
         nickPlayer.pseudonym$getNickname().removePrefix();
         nickManager.pseudonym$updateDisplayName(nickPlayer);
 
-        context.getSource().sendFeedback(() -> feedbackText("Your prefix has been removed.", "", "", Formatting.LIGHT_PURPLE), false);
+        context.getSource().sendSuccess(() -> feedbackText("Your prefix has been removed.", "", "", ChatFormatting.LIGHT_PURPLE), false);
         return 0;
     }
 
-    private static int italicizePrefix(CommandContext<ServerCommandSource> context) {
-        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).networkHandler;
+    private static int italicizePrefix(CommandContext<CommandSourceStack> context) {
+        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).connection;
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
 
         nickPlayer.pseudonym$getNickname().setItalicizedPrefix(!nickPlayer.pseudonym$getNickname().isItalicizedPrefix());
         nickManager.pseudonym$updateDisplayName(nickPlayer);
 
-        Text msg = nickPlayer.pseudonym$getNickname().isItalicizedPrefix() ?
-                Text.literal("Your prefix is now italicized.").formatted(Formatting.AQUA) :
-                Text.literal("Your prefix is no longer italicized.").formatted(Formatting.AQUA);
+        Component msg = nickPlayer.pseudonym$getNickname().isItalicizedPrefix() ?
+                Component.literal("Your prefix is now italicized.").withStyle(ChatFormatting.AQUA) :
+                Component.literal("Your prefix is no longer italicized.").withStyle(ChatFormatting.AQUA);
 
-        context.getSource().sendFeedback(() -> msg, false);
+        context.getSource().sendSuccess(() -> msg, false);
         return 0;
     }
 
-    private static int boldPrefix(CommandContext<ServerCommandSource> context) {
-        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).networkHandler;
+    private static int boldPrefix(CommandContext<CommandSourceStack> context) {
+        NickManager nickManager = (NickManager) Objects.requireNonNull(context.getSource().getPlayer()).connection;
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
 
         nickPlayer.pseudonym$getNickname().setBoldPrefix(!nickPlayer.pseudonym$getNickname().isBoldPrefix());
         nickManager.pseudonym$updateDisplayName(nickPlayer);
 
-        Text msg = nickPlayer.pseudonym$getNickname().isBoldPrefix() ?
-                Text.literal("Your prefix is now bold.").formatted(Formatting.AQUA) :
-                Text.literal("Your prefix is no longer bold.").formatted(Formatting.AQUA);
+        Component msg = nickPlayer.pseudonym$getNickname().isBoldPrefix() ?
+                Component.literal("Your prefix is now bold.").withStyle(ChatFormatting.AQUA) :
+                Component.literal("Your prefix is no longer bold.").withStyle(ChatFormatting.AQUA);
 
-        context.getSource().sendFeedback(() -> msg, false);
+        context.getSource().sendSuccess(() -> msg, false);
         return 0;
     }
 
-    private static int parrotPrefix(CommandContext<ServerCommandSource> context) {
-        final Text noPrefix = Text.literal("Your don't currently have a prefix set.").formatted(Formatting.AQUA);
+    private static int parrotPrefix(CommandContext<CommandSourceStack> context) {
+        final Component noPrefix = Component.literal("Your don't currently have a prefix set.").withStyle(ChatFormatting.AQUA);
 
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
-        Text prefix = nickPlayer.pseudonym$getNickname().getPrefix();
+        Component prefix = nickPlayer.pseudonym$getNickname().getPrefix();
 
-        Text prefixText = prefix == null ? noPrefix : feedbackText("Your current prefix is \"", prefix.getString(), "\"", nickPlayer.pseudonym$getNickname().getPrefixColor());
+        Component prefixText = prefix == null ? noPrefix : feedbackText("Your current prefix is \"", prefix.getString(), "\"", nickPlayer.pseudonym$getNickname().getPrefixColor());
 
-        context.getSource().sendFeedback(() -> prefixText, false);
+        context.getSource().sendSuccess(() -> prefixText, false);
 
         return 0;
     }
 
-    private static final SuggestionProvider<ServerCommandSource> COLOR_PROVIDER = (source, builder) -> {
-        return CommandSource.suggestMatching(Formatting.getNames(true, false), builder);
+    private static final SuggestionProvider<CommandSourceStack> COLOR_PROVIDER = (source, builder) -> {
+        return SharedSuggestionProvider.suggest(ChatFormatting.getNames(true, false), builder);
     };
 
-    private static Text feedbackText(String intro, String var, String end, Formatting varColor) {
-        return Text.literal(intro)
-                .formatted(Formatting.AQUA)
-                .append(Text.literal(var).formatted(varColor, Formatting.ITALIC))
-                .append(Text.literal(end).formatted(Formatting.RESET, Formatting.AQUA));
+    private static Component feedbackText(String intro, String var, String end, ChatFormatting varColor) {
+        return Component.literal(intro)
+                .withStyle(ChatFormatting.AQUA)
+                .append(Component.literal(var).withStyle(varColor, ChatFormatting.ITALIC))
+                .append(Component.literal(end).withStyle(ChatFormatting.RESET, ChatFormatting.AQUA));
     }
 }
