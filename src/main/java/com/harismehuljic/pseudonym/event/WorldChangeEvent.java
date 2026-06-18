@@ -1,11 +1,11 @@
 package com.harismehuljic.pseudonym.event;
 
 import com.harismehuljic.pseudonym.nicknames.impl.NickPlayer;
-import net.fabricmc.fabric.api.entity.event.v1.ServerEntityWorldChangeEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerEntityLevelChangeEvents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 
-public class WorldChangeEvent implements ServerEntityWorldChangeEvents.AfterPlayerChange {
+public class WorldChangeEvent implements ServerEntityLevelChangeEvents.AfterPlayerChange {
     /**
      * Called after a player has been moved to different world.
      *
@@ -14,7 +14,7 @@ public class WorldChangeEvent implements ServerEntityWorldChangeEvents.AfterPlay
      * @param destination the new world the player was moved to
      */
     @Override
-    public void afterChangeWorld(ServerPlayer player, ServerLevel origin, ServerLevel destination) {
+    public void afterChangeLevel(ServerPlayer player, ServerLevel origin, ServerLevel destination) {
         NickPlayer nickPlayer = (NickPlayer) player;
 
         nickPlayer.pseudonym$getNickname().getNicknameLabel().destroyLabel();
