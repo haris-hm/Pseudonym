@@ -2,6 +2,7 @@ package com.harismehuljic.pseudonym.mixin;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
@@ -21,7 +22,7 @@ public abstract class EntityMixin {
     )
     private boolean pseudonym$allowPlayerVehicles(EntityType instance) {
         // Pretend players are saveable so the condition evaluates to false
-        if (instance == EntityType.PLAYER) {
+        if (instance == EntityTypes.PLAYER) {
             return true;
         }
         // All other entity types keep their normal behaviour

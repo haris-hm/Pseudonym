@@ -1,14 +1,14 @@
 package com.harismehuljic.pseudonym.nicknames;
 
 import com.mojang.authlib.GameProfile;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Optional;
 
 public class Nickname {
     private final Component realName;
@@ -140,7 +140,7 @@ public class Nickname {
             this.nicknameData.putString("nickname", nickname.getString());
         }
 
-        this.nicknameData.putString("nick_color", color == null ? ChatFormatting.WHITE.getName() : color.getName());
+        this.nicknameData.putString("nick_color", color == null ? Formatting.WHITE.getName() : Formatting.getIdFromFormat(color));
         this.nicknameData.putBoolean("nick_italic", italicized);
         this.nicknameData.putBoolean("nick_bold", bold);
 
@@ -159,7 +159,7 @@ public class Nickname {
             this.nicknameData.putString("prefix", this.prefix.getString());
         }
 
-        this.nicknameData.putString("prefix_color", color == null ? ChatFormatting.WHITE.getName() : color.getName());
+        this.nicknameData.putString("prefix_color", color == null ? Formatting.WHITE.getName() : Formatting.getIdFromFormat(color));
         this.nicknameData.putBoolean("prefix_italic", italicizedPrefix);
         this.nicknameData.putBoolean("prefix_bold", boldPrefix);
 
@@ -173,7 +173,7 @@ public class Nickname {
     }
 
     public void setNickColor(String color) {
-        this.setNickname(this.nickname, ChatFormatting.getByName(color), this.italicizedNick, this.boldNick);
+        this.setNickname(this.nickname, Formatting.getByName(color).getFormat(), this.italicizedNick, this.boldNick);
     }
 
     public void setNickname(Component nickname) {
@@ -197,7 +197,7 @@ public class Nickname {
     }
 
     public void setPrefixColor(String color) {
-        this.setPrefix(this.prefix, ChatFormatting.getByName(color), this.italicizedPrefix, this.boldPrefix);
+        this.setPrefix(this.prefix, Formatting.getByName(color).getFormat(), this.italicizedPrefix, this.boldPrefix);
     }
 
     public void setPrefix(Component prefix) {

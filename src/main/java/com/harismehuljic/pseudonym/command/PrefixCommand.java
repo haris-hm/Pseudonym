@@ -1,6 +1,7 @@
 package com.harismehuljic.pseudonym.command;
 
 import com.harismehuljic.pseudonym.Pseudonym;
+import com.harismehuljic.pseudonym.nicknames.Formatting;
 import com.harismehuljic.pseudonym.nicknames.impl.NickManager;
 import com.harismehuljic.pseudonym.nicknames.impl.NickPlayer;
 import com.mojang.brigadier.CommandDispatcher;
@@ -8,13 +9,14 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import java.util.Objects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
+
+import java.util.Objects;
 
 import static net.minecraft.commands.Commands.literal;
 
@@ -79,7 +81,7 @@ public class PrefixCommand {
         NickPlayer nickPlayer = (NickPlayer) Objects.requireNonNull(context.getSource().getPlayer());
         final String color = StringArgumentType.getString(context, "color");
 
-        if (!ChatFormatting.getNames(true, false).contains(color)) {
+        if (!Formatting.getIds().contains(color)) {
             context.getSource().sendSuccess(() -> feedbackText("Sorry, but \"", color, "\" isn't a valid color.", ChatFormatting.LIGHT_PURPLE), false);
             return 1;
         }
@@ -87,7 +89,7 @@ public class PrefixCommand {
         nickPlayer.pseudonym$getNickname().setPrefixColor(color);
         nickManager.pseudonym$updateDisplayName(nickPlayer);
 
-        context.getSource().sendSuccess(() -> feedbackText("Your prefix color has been changed to \"", color, "\"", ChatFormatting.getByName(color)), false);
+        context.getSource().sendSuccess(() -> feedbackText("Your prefix color has been changed to \"", color, "\"", Formatting.getByName(color).getFormat()), false);
         return 0;
     }
 
@@ -146,7 +148,7 @@ public class PrefixCommand {
     }
 
     private static final SuggestionProvider<CommandSourceStack> COLOR_PROVIDER = (source, builder) -> {
-        return SharedSuggestionProvider.suggest(ChatFormatting.getNames(true, false), builder);
+        return SharedSuggestionProvider.suggest(Formatting.getIds(), builder);
     };
 
     private static Component feedbackText(String intro, String var, String end, ChatFormatting varColor) {

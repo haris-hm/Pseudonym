@@ -8,7 +8,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import org.joml.Vector3f;
 
 public class NicknameLabel {
@@ -26,7 +26,7 @@ public class NicknameLabel {
     public void createCustomLabel() {
         ServerLevel world = this.spe.level();
 
-        this.label = new Display.TextDisplay(EntityType.TEXT_DISPLAY, world);
+        this.label = new Display.TextDisplay(EntityTypes.TEXT_DISPLAY, world);
         this.label.setPos(this.spe.position());
         this.tickLabel(true);
 
